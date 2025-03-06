@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4a6fa5">
+    <meta name="description" content="Weekly tracker app for foods and activities with automatic reset">
+    <title>Weekly Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Weekly Tracker</h1>
+            <button id="theme-toggle" aria-label="Toggle dark/light mode">
+                <span class="light-icon">🌙</span>
+                <span class="dark-icon">☀️</span>
+            </button>
+        </header>
+        
+        <div class="stats-container">
+            <div class="current-week">
+                <h2>Current Week</h2>
+                <div class="counters">
+                    <div class="counter">
+                        <span class="counter-label">Foods:</span>
+                        <span id="foods-counter">0</span>
+                    </div>
+                    <div class="counter">
+                        <span class="counter-label">Activities:</span>
+                        <span id="activities-counter">0</span>
+                    </div>
+                    <div class="counter">
+                        <span class="counter-label">Total:</span>
+                        <span id="total-counter">0</span>
+                    </div>
+                </div>
+                <div class="next-reset">
+                    <span>Next reset: </span>
+                    <span id="next-reset-date">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="todo-input">
+            <input type="text" id="todo-input" placeholder="Add a new item...">
+            <div class="todo-options">
+                <select id="category-select">
+                    <option value="">Select Category</option>
+                    <option value="foods">Foods</option>
+                    <option value="activities">Activities</option>
+                </select>
+            </div>
+            <button id="add-button">Add</button>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label>Show:</label>
+                <select id="filter-category">
+                    <option value="all">All Categories</option>
+                    <option value="foods">Foods</option>
+                    <option value="activities">Activities</option>
+                </select>
+                <select id="filter-status">
+                    <option value="all">All Status</option>
+                    <option value="active">Not Completed</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+        
+        <ul id="todo-list">
+            <!-- Todo items will be added here dynamically -->
+        </ul>
+        
+        <div class="history-container">
+            <h2>History</h2>
+            <div id="history-list">
+                <!-- History items will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
