@@ -322,71 +322,107 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Function to render todos
     function renderTodos() {
-        // Clear the current list
+        const todoList = document.getElementById('todo-list');
         todoList.innerHTML = '';
         
         // Get filter values
-        const categoryFilter = filterCategory.value;
-        const statusFilter = filterStatus.value;
+        const filterCategory = document.getElementById('filter-category').value;
+        const filterStatus = document.getElementById('filter-status').value;
         
-        // Filter todos
-        let filteredTodos = todos.filter(todo => {
+        // Apply filters
+        const filteredTodos = todos.filter(todo => {
             // Category filter
-            if (categoryFilter !== 'all' && todo.category !== categoryFilter) {
+            if (filterCategory !== 'all' && todo.category !== filterCategory) {
                 return false;
             }
             
             // Status filter
-            if (statusFilter === 'active' && todo.completed) {
+            if (filterStatus === 'active' && todo.completed) {
                 return false;
             }
-            if (statusFilter === 'completed' && !todo.completed) {
+            if (filterStatus === 'completed' && !todo.completed) {
                 return false;
             }
             
             return true;
         });
         
-        // Render each todo
+        // Check if we're on a mobile device
+        const isMobile = window.innerWidth <= 768;
+        
+        // Render filtered todos
         filteredTodos.forEach(todo => {
             const li = document.createElement('li');
-            li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+            li.className = 'todo-item';
             
-            li.innerHTML = `
-                <div class="todo-content">
-                    <span class="category-indicator category-${todo.category}"></span>
-                    <span class="todo-text">${todo.text}</span>
-                </div>
-                <div class="todo-actions">
-                    <button class="complete-btn">${todo.completed ? 'Undo' : 'Complete'}</button>
-                    <button class="edit-btn">Edit</button>
-                    <button class="delete-btn">Delete</button>
-                </div>
-            `;
+            // Add category class
+            li.classList.add(todo.category);
             
-            // Add event listeners for buttons
-            const completeBtn = li.querySelector('.complete-btn');
+            // Add completed class if needed
+            if (todo.completed) {
+                li.classList.add('completed');
+            }
+            
+            // Create todo text element
+            const todoText = document.createElement('span');
+            todoText.className = 'todo-text';
+            todoText.textContent = todo.text;
+            
+            // Add category indicator before the text
+            const categoryIndicator = document.createElement('span');
+            categoryIndicator.className = `category-indicator category-${todo.category}`;
+            li.appendChild(categoryIndicator);
+            
+            li.appendChild(todoText);
+            
+            // Create actions container
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'todo-actions';
+            
+            // Complete button
+            const completeBtn = document.createElement('button');
+            completeBtn.className = 'complete-btn';
+            completeBtn.textContent = isMobile ? 'C' : 'Complete';
             completeBtn.addEventListener('click', () => {
                 toggleComplete(todo.id);
+                renderTodos();
+                saveData();
             });
+            actionsDiv.appendChild(completeBtn);
             
-            const editBtn = li.querySelector('.edit-btn');
+            // Edit button
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = isMobile ? 'E' : 'Edit';
             editBtn.addEventListener('click', () => {
-                editTodo(todo.id);
+                const newText = prompt('Edit task:', todo.text);
+                if (newText !== null && newText.trim() !== '') {
+                    todo.text = newText.trim();
+                    renderTodos();
+                    saveData();
+                }
             });
+            actionsDiv.appendChild(editBtn);
             
-            const deleteBtn = li.querySelector('.delete-btn');
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = isMobile ? 'D' : 'Delete';
             deleteBtn.addEventListener('click', () => {
                 deleteTodo(todo.id);
+                renderTodos();
+                saveData();
             });
+            actionsDiv.appendChild(deleteBtn);
             
+            li.appendChild(actionsDiv);
             todoList.appendChild(li);
         });
         
-        // Show message if no todos
-        if (filteredTodos.length === 0) {
-            todoList.innerHTML = '<li class="no-todos">No items found</li>';
-        }
+        // Update counters display
+        document.getElementById('foods-counter').textContent = counters.foods;
+        document.getElementById('activities-counter').textContent = counters.activities;
+        document.getElementById('total-counter').textContent = counters.total;
     }
     
     // Function to toggle the completed status
